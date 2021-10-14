@@ -20,22 +20,18 @@ document.addEventListener("DOMContentLoaded", () => {
     monedasSelect.addEventListener("change",leerValor);
 });
 
-function consultarCriptomonedas(){
+async function consultarCriptomonedas(){
     const url = `https://min-api.cryptocompare.com/data/top/mktcapfull?limit=10&tsym=USD`;
 
-    fetch(url)
-        .then(respuesta => {
-            return respuesta.json();
-        })
-        .then(resultado => {
-            return obtenerCriptomonedas(resultado.Data);
-        })
-        .then(criptomonedas => {
-            return selectCriptomonedas(criptomonedas);
-        })
-        .catch(error => {
-            console.log(error);
-        })
+    try {
+        const respuesta = await fetch(url);
+        const resultado = await respuesta.json();
+        const criptomonedas = await obtenerCriptomonedas(resultado.Data);
+        selectCriptomonedas(criptomonedas);
+    } catch (error) {
+        console.log(error);
+    }
+    
 }
 
 function selectCriptomonedas(criptomonedas){
@@ -82,22 +78,21 @@ function mostrarAlerta(mensaje){
     }    
 }
 
-function consultarAPI(){
+async function consultarAPI(){
     const {moneda, criptomoneda} = objBusqueda;
 
     const url = `https://min-api.cryptocompare.com/data/pricemultifull?fsyms=${criptomoneda}&tsyms=${moneda}`;
 
     mostrarSpinner();
-    fetch(url)
-        .then(respuesta => {
-            return respuesta.json();
-        })
-        .then(resultado => {
-            mostrarConversion(resultado.DISPLAY[criptomoneda][moneda]);
-        })
-        .catch(error => {
-            console.log(error);
-        })
+    
+    try {
+        const respuesta = await fetch(url);
+        const resultado = await respuesta.json();
+        mostrarConversion(resultado.DISPLAY[criptomoneda][moneda]);    
+    } catch (error) {
+        console.log(error);
+    }
+    
 }
 
 function mostrarConversion(dato){
@@ -119,7 +114,7 @@ function mostrarConversion(dato){
     `;
     const cambioPrecio  = document.createElement("p");
     cambioPrecio.innerHTML = ` 
-        El cambio en el precio ha sido de: <span> ${CHANGEPCT24HOUR} </span>
+        El cambio en el precio ha sido de: <span> ${CHANGEPCT24HOUR}% </span>
     `;
     const updatePrecio  = document.createElement("p");
     updatePrecio.innerHTML = ` 
